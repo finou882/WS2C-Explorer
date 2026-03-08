@@ -1,9 +1,8 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui";
-import { useThemeMode } from "@/hooks/useThemeMode";
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,7 +17,7 @@ const navigation = [
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dark, setDark] = useThemeMode();
+  // ダークモード廃止
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -113,35 +112,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:block bg-background border-r">
-        <div className="p-4 border-b">
-          <h1 className="font-bold text-lg">WS2C Explorer</h1>
-          <p className="text-xs text-muted-foreground">Web System for Club Collaboration</p>
-        </div>
-        <nav className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? location.pathname === "/"
-                : location.pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+      {/* Desktop sidebar removed: all navigation is now via the right-side drawer for all screen sizes */}
 
       {/* Main content */}
       <div className="w-full">
@@ -149,19 +120,12 @@ export default function Layout({ children }: LayoutProps) {
         <header className="sticky top-0 z-40 bg-background border-b">
           <div className="flex items-center justify-between h-14 px-4">
             <div className="flex-1 flex items-center">
-              <a href="/" className="text-2xl font-extrabold text-black dark:text-white hover:underline transition-colors w-4/5 truncate">
+              <a href="/" className="text-2xl font-extrabold text-black hover:underline transition-colors w-4/5 truncate">
                 WS2C Exproler
               </a>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="ダークモード切替"
-                onClick={() => setDark((v: boolean) => !v)}
-              >
-                {dark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-              </Button>
+              {/* ダークモード切替ボタン削除 */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -179,7 +143,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
       {/* 右下バージョン表記 */}
       <div className="fixed bottom-2 right-4 z-50 text-xs text-muted-foreground select-none pointer-events-none">
-        v0.0.2
+        v1.0.0-alpha by Finou
       </div>
     </div>
   );

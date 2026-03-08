@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -36,6 +36,9 @@ export default function ActivityPage() {
     })();
   }, []);
 
+  useEffect(() => {
+    document.title = "活動日カレンダー | WS2C Explorer";
+  }, []);
 
   // Map team value to label for display
   const teamOptions = [
@@ -173,7 +176,7 @@ export default function ActivityPage() {
     </div>
     {/* Version info bottom right, always on viewport */}
     <div className="fixed bottom-2 right-4 text-xs text-gray-400 select-none z-[9999] pointer-events-none">
-      v0.0.2 by Finou
+      v1.0.0-alpha by Finou
     </div>
     </>
   );

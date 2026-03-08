@@ -1,12 +1,13 @@
 // Cloudflare Pages Functions: Items API
-import { type RequestHandler } from '@cloudflare/pages-plugin-router';
+import type { RequestHandler } from '@cloudflare/pages-plugin-router';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../database.types';
 
 const getSupabase = (env: any) =>
   createClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-export const onRequestGet: RequestHandler = async ({ request, env }) => {
+export const onRequestGet: RequestHandler = async (context: any) => {
+  const { request, env } = context;
   const url = new URL(request.url);
   const supabase = getSupabase(env);
   const category = url.searchParams.get('category');
@@ -23,7 +24,8 @@ export const onRequestGet: RequestHandler = async ({ request, env }) => {
   return new Response(JSON.stringify({ items: data }), { headers: { 'Content-Type': 'application/json' } });
 };
 
-export const onRequestPost: RequestHandler = async ({ request, env }) => {
+export const onRequestPost: RequestHandler = async (context: any) => {
+  const { request, env } = context;
   const supabase = getSupabase(env);
   const body = await request.json();
   const insertData = {

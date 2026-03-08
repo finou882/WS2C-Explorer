@@ -1,4 +1,5 @@
-import { useState } from "react";
+  // ...existing code...
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
@@ -62,6 +63,9 @@ export default function ItemDetailPage() {
 
   const statusInfo = statusLabels[item.status] ?? { label: item.status, variant: "secondary" as const };
 
+  useEffect(() => {
+    document.title = item ? `${item.name} | WS2C Explorer` : "アイテム詳細 | WS2C Explorer";
+  }, [item]);
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">

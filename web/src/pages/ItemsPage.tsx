@@ -1,4 +1,5 @@
-import { useState } from "react";
+  // ...existing code...
+import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search, Package } from "lucide-react";
@@ -64,6 +65,10 @@ export default function ItemsPage() {
     }
     setSearchParams(params);
   };
+
+  useEffect(() => {
+    document.title = "アイテム一覧 | WS2C Explorer";
+  }, []);
 
   return (
     <div className="space-y-6 w-full">

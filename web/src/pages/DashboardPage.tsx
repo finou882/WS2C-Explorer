@@ -1,14 +1,15 @@
-
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Package, FolderOpen, AlertTriangle, Plus } from "lucide-react";
 import { itemsApi } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardContent, Button } from "@/components/ui";
-import { useEffect, useState } from "react";
-import { fetchRecentActivityDays } from "@/lib/recentActivityApi";
-
+import { fetchRecentActivityDays } from "@/lib/recentActivityApi"; // ←これを追加
 
 export default function DashboardPage() {
+  useEffect(() => {
+    document.title = "ダッシュボード | WS2C Explorer";
+  }, []);
   const { data: itemsData } = useQuery({
     queryKey: ["items"],
     queryFn: () => itemsApi.list(),

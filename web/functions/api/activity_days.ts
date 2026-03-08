@@ -1,12 +1,13 @@
 // Cloudflare Pages Functions: Activity API
-import { type RequestHandler } from '@cloudflare/pages-plugin-router';
+import type { RequestHandler } from '@cloudflare/pages-plugin-router';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../database.types';
 
 const getSupabase = (env: any) =>
   createClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-export const onRequestGet: RequestHandler = async ({ env }) => {
+export const onRequestGet: RequestHandler = async (context: any) => {
+  const { env } = context;
   const supabase = getSupabase(env);
   const { data, error } = await supabase
     .from('activity_days')
@@ -16,7 +17,8 @@ export const onRequestGet: RequestHandler = async ({ env }) => {
   return new Response(JSON.stringify({ days: data }), { headers: { 'Content-Type': 'application/json' } });
 };
 
-export const onRequestPost: RequestHandler = async ({ request, env }) => {
+export const onRequestPost: RequestHandler = async (context: any) => {
+  const { request, env } = context;
   const supabase = getSupabase(env);
   const body = await request.json();
   if (!body.date) return new Response(JSON.stringify({ error: 'date is required' }), { status: 400 });
@@ -25,7 +27,8 @@ export const onRequestPost: RequestHandler = async ({ request, env }) => {
   return new Response(JSON.stringify({ day: data[0] }), { headers: { 'Content-Type': 'application/json' } });
 };
 
-export const onRequestDelete: RequestHandler = async ({ request, env }) => {
+export const onRequestDelete: RequestHandler = async (context: any) => {
+  const { request, env } = context;
   const supabase = getSupabase(env);
   const url = new URL(request.url);
   const id = url.searchParams.get('id');
