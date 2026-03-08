@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
+import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ const navigation = [
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dark, setDark] = useThemeMode();
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -147,23 +149,37 @@ export default function Layout({ children }: LayoutProps) {
         <header className="sticky top-0 z-40 bg-background border-b">
           <div className="flex items-center justify-between h-14 px-4">
             <div className="flex-1 flex items-center">
-              <a href="/" className="text-2xl font-extrabold text-black hover:underline transition-colors w-4/5 truncate">
+              <a href="/" className="text-2xl font-extrabold text-black dark:text-white hover:underline transition-colors w-4/5 truncate">
                 WS2C Exproler
               </a>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-              className="ml-2"
-            >
-              <Menu className="w-7 h-7" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="ダークモード切替"
+                onClick={() => setDark((v: boolean) => !v)}
+              >
+                {dark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(true)}
+                className="ml-2"
+              >
+                <Menu className="w-7 h-7" />
+              </Button>
+            </div>
           </div>
         </header>
 
         {/* Page content */}
         <main className="p-4 lg:p-6 w-full">{children}</main>
+      </div>
+      {/* 右下バージョン表記 */}
+      <div className="fixed bottom-2 right-4 z-50 text-xs text-muted-foreground select-none pointer-events-none">
+        v0.0.2
       </div>
     </div>
   );

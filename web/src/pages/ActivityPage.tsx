@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import FullCalendar from '@fullcalendar/react';
+import FullCalendar from '@fullcalendar/react/dist/vdom';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { supabase } from "../lib/supabase";
@@ -171,7 +171,7 @@ export default function ActivityPage() {
     </div>
     {/* Version info bottom right, always on viewport */}
     <div className="fixed bottom-2 right-4 text-xs text-gray-400 select-none z-[9999] pointer-events-none">
-      v0.0.1 RC1 by Finou
+      v0.0.2 by Finou
     </div>
     </>
   );
