@@ -17,8 +17,9 @@ activity.get("/activity_days", async (c) => {
 activity.post("/activity_days", async (c) => {
   const body = await c.req.json();
   if (!body.date) return c.json({ error: "date is required" }, 400);
-  const { data, error } = await supabase
-    .from("activity_days")
+  // Supabaseクエリチェーンに型を明示してnever型エラーを回避
+  const { data, error } = await (supabase
+    .from("activity_days") as ReturnType<import("@supabase/supabase-js").SupabaseClient<import("../database.types").Database>["from"]>)
     .insert([{ date: body.date }])
     .select();
   if (error) return c.json({ error: error.message }, 500);
