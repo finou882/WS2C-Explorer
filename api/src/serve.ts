@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config();
 
 import { serve } from "@hono/node-server";
-import app from "./index";
+import app from "./index.js";
 
 const port = parseInt(process.env.PORT || "3000", 10);
 
