@@ -7,7 +7,11 @@ const app = new Hono();
 // Middleware
 app.use("*", logger());
 app.use("*", async (c, next) => {
-    const corsOrigin = c.env?.CORS_ORIGIN || process.env.CORS_ORIGIN || "*";
+    let corsOrigin = c.env?.CORS_ORIGIN || process.env.CORS_ORIGIN || "*";
+    // Support comma-separated origins
+    if (typeof corsOrigin === "string" && corsOrigin.includes(",")) {
+        corsOrigin = corsOrigin.split(",").map(o => o.trim());
+    }
     const corsMiddleware = cors({
         origin: corsOrigin,
         allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
