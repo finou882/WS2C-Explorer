@@ -1,4 +1,4 @@
-name = "wsc"
+name = "ws2c"
 type = "javascript"
 account_id = ""
 workers_dev = true
