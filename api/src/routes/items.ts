@@ -20,10 +20,11 @@ function getEnv(c: any): Env {
 // Helper to get Supabase client
 function getSupabase(c: any) {
   const env = getEnv(c);
+  // Explicitly type as SupabaseClient<Database> for correct generics
   return createServiceClient(
     env.SUPABASE_URL,
     env.SUPABASE_ANON_KEY
-  );
+  ) as import("@supabase/supabase-js").SupabaseClient<Database>;
 }
 
 // List all items
@@ -70,8 +71,10 @@ itemsRoutes.get("/categories", async (c) => {
     return c.json({ error: "Failed to fetch categories" }, 500);
   }
 
-  // Get unique categories
-  const categories = [...new Set(data?.map((d) => d.category).filter(Boolean))];
+  // Explicitly type data as array of objects with category
+  const categories = [
+    ...new Set((data as { category: string }[] | null)?.map((d) => d.category).filter(Boolean)),
+  ];
   return c.json({ categories });
 });
 
@@ -95,19 +98,23 @@ itemsRoutes.get("/:id", async (c) => {
 
 // Create item
 itemsRoutes.post("/", async (c) => {
+
   const supabase = getSupabase(c);
   const body = await c.req.json<PosInsert>();
 
-  const { data, error } = await supabase
-    .from("pos")
-    .insert({
-      name: body.name,
-      pieces: body.pieces ?? 1,
-      category: body.category ?? "",
-      status: body.status ?? "good",
-      location: body.location ?? "",
-      timestamp: new Date().toISOString(),
-    })
+  const insertData: PosInsert = {
+    name: body.name,
+    pieces: body.pieces ?? 1,
+    category: body.category ?? "",
+    status: body.status ?? "good",
+    location: body.location ?? "",
+    timestamp: new Date().toISOString(),
+  };
+
+  // Explicitly type the query chain to fix never type error
+  const { data, error } = await (supabase
+    .from("pos") as ReturnType<import("@supabase/supabase-js").SupabaseClient<Database>["from"]>)
+    .insert(insertData)
     .select()
     .single();
 
@@ -121,12 +128,14 @@ itemsRoutes.post("/", async (c) => {
 
 // Update item
 itemsRoutes.patch("/:id", async (c) => {
+
   const supabase = getSupabase(c);
   const id = c.req.param("id");
   const body = await c.req.json<PosUpdate>();
 
-  const { data, error } = await supabase
-    .from("pos")
+  // Explicitly type the query chain to fix never type error
+  const { data, error } = await (supabase
+    .from("pos") as ReturnType<import("@supabase/supabase-js").SupabaseClient<Database>["from"]>)
     .update({
       ...body,
       timestamp: new Date().toISOString(),

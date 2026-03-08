@@ -1,3 +1,12 @@
+// --- Default supabase client for compatibility ---
+import dotenv from "dotenv";
+dotenv.config();
+
+// Create a default supabase client using env vars (for legacy code)
+export const supabase = createSupabaseClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+);
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import fetch from "node-fetch";
@@ -20,13 +29,13 @@ function createProxyFetch() {
   };
 }
 
+
 export function createSupabaseClient(
   supabaseUrl: string,
   supabaseKey: string,
   accessToken?: string
-): SupabaseClient<Database> {
+): import("@supabase/supabase-js").SupabaseClient<Database> {
   const customFetch = createProxyFetch();
-  
   return createClient<Database>(supabaseUrl, supabaseKey, {
     auth: {
       persistSession: false,
@@ -41,12 +50,12 @@ export function createSupabaseClient(
   });
 }
 
+
 export function createServiceClient(
   supabaseUrl: string,
   serviceRoleKey: string
-): SupabaseClient<Database> {
+): import("@supabase/supabase-js").SupabaseClient<Database> {
   const customFetch = createProxyFetch();
-  
   return createClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: {
       persistSession: false,
