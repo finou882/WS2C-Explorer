@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
