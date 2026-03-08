@@ -1,0 +1,45 @@
+/* calendar-custom.css: 罫線・シンプル月間カレンダー用 */
+
+.rdp {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background: #fff;
+}
+.rdp-table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100%;
+  table-layout: fixed !important;
+  background: #fff;
+}
+.rdp-head,
+.rdp-row {
+  background: #fff;
+}
+.rdp-head th,
+.rdp-row td {
+  border: 1px solid #bbb !important;
+  background: #fff !important;
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  font-size: 1.3rem;
+  padding: 0.5rem 0 !important; /* Updated padding */
+  text-align: center;
+  width: 14.28vw;
+  max-width: 14.28vw;
+}
+.rdp-head th {
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: #fff !important;
+}
+.rdp-head th:first-child { color: #c00; }
+.rdp-head th:last-child { color: #00c; }
+
+.rdp-caption {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  padding-left: 1rem;
+}
