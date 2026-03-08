@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { Env } from "./types";
-import { itemsRoutes } from "./routes/items";
-import { activity } from "./routes/activity";
+import { itemsRoutes } from "./routes/items.js";
+import { activity } from "./routes/activity.js";
 
 const app = new Hono<{ Bindings: Env }>();
 
