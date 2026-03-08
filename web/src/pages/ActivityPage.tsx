@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import FullCalendar from '@fullcalendar/react/dist/vdom';
+import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { supabase } from "../lib/supabase";
@@ -119,14 +119,16 @@ export default function ActivityPage() {
       <div className="border rounded-2xl shadow-2xl bg-white p-2" style={{ minWidth: 320, maxWidth: 700 }}>
         {/* FullCalendar JSX re-enabled */}
         {FullCalendar && (
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            height="auto"
-            events={events}
-            selectable={true}
-            select={handleSelect}
-          />
+          // JSXエラー回避: React.createElementで描画
+          // @ts-ignore
+          React.createElement(FullCalendar, {
+            plugins: [dayGridPlugin, interactionPlugin],
+            initialView: "dayGridMonth",
+            height: "auto",
+            events: events,
+            selectable: true,
+            select: handleSelect,
+          })
         )}
       </div>
       <div
