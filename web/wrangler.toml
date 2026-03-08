@@ -1,4 +1,4 @@
-name = "activity-calendar-web"
+name = "wsc"
 type = "javascript"
 account_id = ""
 workers_dev = true
