@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { createServiceClient } from "../lib/supabase";
+import { createServiceClient } from "../lib/supabase.js";
 export const itemsRoutes = new Hono();
 // Helper to get env (Cloudflare bindings or Node.js process.env)
 function getEnv(c) {

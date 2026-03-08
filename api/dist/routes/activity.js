@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../lib/supabase.js";
 export const activity = new Hono();
 // GET /activity_days - 全活動日取得
 activity.get("/activity_days", async (c) => {

@@ -10,7 +10,7 @@ export const supabase = createSupabaseClient(
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import fetch from "node-fetch";
-import type { Database } from "../database.types";
+import type { Database } from "../database.types.js";
 
 // Create a custom fetch that uses proxy if configured
 function createProxyFetch() {

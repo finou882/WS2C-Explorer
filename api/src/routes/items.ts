@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "../types";
-import { createServiceClient } from "../lib/supabase";
+import { createServiceClient } from "../lib/supabase.js";
 import type { Database } from "../database.types";
 
 type PosInsert = Database["public"]["Tables"]["pos"]["Insert"];
