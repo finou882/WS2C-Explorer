@@ -8,6 +8,10 @@
     "build": "pnpm --parallel -r build",
     "deploy": "pnpm --parallel -r deploy"
   },
+  "workspaces": [
+    "api",
+    "web"
+  ],
   "devDependencies": {
     "typescript": "^5.4.0"
   },
