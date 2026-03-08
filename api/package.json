@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:node": "tsx watch src/serve.ts",
-    "build": "wrangler deploy --dry-run",
+    "build": "tsc -p tsconfig.node.json",
     "build:node": "tsc -p tsconfig.node.json",
     "start": "node dist/serve.js",
     "deploy": "wrangler deploy",
