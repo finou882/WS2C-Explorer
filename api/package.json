@@ -1,0 +1,32 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:node": "tsx watch src/serve.ts",
+    "build": "wrangler deploy --dry-run",
+    "build:node": "tsc -p tsconfig.node.json",
+    "start": "node dist/serve.js",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.11",
+    "@supabase/supabase-js": "^2.43.0",
+    "dotenv": "^17.3.1",
+    "global-agent": "^4.1.2",
+    "hono": "^4.4.0",
+    "https-proxy-agent": "^7.0.6",
+    "node-fetch": "^3.3.2",
+    "undici": "^7.22.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240512.0",
+    "@types/node": "^20.12.0",
+    "tsx": "^4.10.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.57.0"
+  }
+}

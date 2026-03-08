@@ -1,0 +1,20 @@
+{
+  "name": "club-inventory",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "build": "pnpm --parallel -r build",
+    "deploy": "pnpm --parallel -r deploy"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20"
+  }
+}

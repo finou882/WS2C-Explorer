@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SUPABASE_URL=https://dpattreyxjnlnkagllns.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYXR0cmV5eGpubG5rYWdsbG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDUzODYsImV4cCI6MjA4NzUyMTM4Nn0.LNaNKBZpL8vX3Y-4Aq1WAfXsw7tw-pDqR5p2SuBEQCk
+      - CORS_ORIGIN=http://localhost:8080
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:3000
+        - VITE_SUPABASE_URL=https://dpattreyxjnlnkagllns.supabase.co
+        - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYXR0cmV5eGpubG5rYWdsbG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDUzODYsImV4cCI6MjA4NzUyMTM4Nn0.LNaNKBZpL8vX3Y-4Aq1WAfXsw7tw-pDqR5p2SuBEQCk
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    restart: unless-stopped

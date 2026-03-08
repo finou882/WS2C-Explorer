@@ -1,0 +1,11 @@
+name = "club-inventory-api"
+main = "src/index.ts"
+compatibility_date = "2024-05-01"
+
+[vars]
+CORS_ORIGIN = "http://localhost:5173"
+SUPABASE_URL = "https://dpattreyxjnlnkagllns.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYXR0cmV5eGpubG5rYWdsbG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDUzODYsImV4cCI6MjA4NzUyMTM4Nn0.LNaNKBZpL8vX3Y-4Aq1WAfXsw7tw-pDqR5p2SuBEQCk"
+
+# Service role key - set via wrangler secret for production
+# wrangler secret put SUPABASE_SERVICE_ROLE_KEY
