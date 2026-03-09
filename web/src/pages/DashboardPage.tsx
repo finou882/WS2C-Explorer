@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Package, FolderOpen, AlertTriangle, Plus } from "lucide-react";
+import { Package, FolderOpen, AlertTriangle } from "lucide-react";
 import { itemsApi } from "@/lib/api";
-import { Card, CardHeader, CardTitle, CardContent, Button } from "@/components/ui";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { fetchRecentActivityDays } from "@/lib/recentActivityApi"; // ←これを追加
 
 export default function DashboardPage() {
