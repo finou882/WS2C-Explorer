@@ -20,8 +20,10 @@ const statusLabels: Record<string, { label: string; variant: "success" | "warnin
   broken: { label: "故障", variant: "destructive" },
 };
 
+
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>();
+  if (!id) return null;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -29,7 +31,6 @@ export default function ItemDetailPage() {
   const { data: itemData, isLoading } = useQuery({
     queryKey: ["items", id],
     queryFn: () => itemsApi.get(id!),
-    enabled: !!id,
   });
 
   const deleteMutation = useMutation({
