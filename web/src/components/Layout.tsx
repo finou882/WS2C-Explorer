@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import AuthButton from "@/components/AuthButton";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,10 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-muted/30">
+      {/* ヘッダー右上に認証ボタン */}
+      <div className="w-full flex justify-end items-center px-6 py-2 bg-white border-b sticky top-0 z-40">
+        <AuthButton />
+      </div>
       {/* Right-side drawer sidebar for all screen sizes */}
       <div
         className={`fixed inset-0 z-50 ${sidebarOpen ? "block" : "hidden"}`}
