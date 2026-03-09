@@ -143,8 +143,7 @@ export default function ItemsPage() {
           {items.map((item) => {
             const statusInfo = statusLabels[item.status] ?? { label: item.status, variant: "secondary" as const };
             return (
-              <Link key={item.id} to={`/items/${item.id}`}>
-                <Card className="h-full hover:shadow-md transition-shadow">
+                <Card key={item.id} className="h-full opacity-60">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-lg line-clamp-1">
@@ -167,7 +166,6 @@ export default function ItemsPage() {
                     )}
                   </CardContent>
                 </Card>
-              </Link>
             );
           })}
         </div>

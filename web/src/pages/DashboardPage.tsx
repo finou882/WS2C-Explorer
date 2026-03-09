@@ -82,15 +82,6 @@ export default function DashboardPage() {
           <span>{recentWeekdays.join("・")}</span>
         )}
       </div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">ダッシュボード</h1>
-        <Link to="/items/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            新規アイテム
-          </Button>
-        </Link>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-start justify-start">
         {stats.map((stat) => (
@@ -111,7 +102,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-start justify-start">
         <Card>
           <CardHeader>
-            <CardTitle>最近のアイテム</CardTitle>
+            <CardTitle className="text-foreground">最近のアイテム</CardTitle>
           </CardHeader>
           <CardContent>
             {recentItems.length === 0 ? (
@@ -121,10 +112,9 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-3">
                 {recentItems.map((item) => (
-                  <Link
+                  <div
                     key={item.id}
-                    to={`/items/${item.id}`}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50 opacity-60 cursor-not-allowed"
                   >
                     <div>
                       <p className="font-medium">{item.name}</p>
@@ -135,7 +125,7 @@ export default function DashboardPage() {
                     <span className="text-sm text-muted-foreground">
                       x{item.pieces}
                     </span>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}

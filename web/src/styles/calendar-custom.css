@@ -1,3 +1,16 @@
+.dark .fc-col-header-cell,
+.dark .fc-scrollgrid,
+.dark .fc-scrollgrid-section-header,
+.dark .fc-col-header,
+.dark .fc-scrollgrid-sync-inner {
+  background: hsl(var(--background)) !important;
+}
+.dark .fc-col-header-cell,
+.dark .fc-col-header-cell *,
+.dark .fc-col-header-cell-cushion {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
 /* calendar-custom.css: 罫線・シンプル月間カレンダー用 */
 
 .rdp {
@@ -27,6 +40,17 @@
   text-align: center;
   width: 14.28vw;
   max-width: 14.28vw;
+}
+.dark .rdp-head th,
+.dark .rdp-row td {
+  background: hsl(var(--background)) !important;
+}
+
+.dark .rdp,
+.dark .rdp-table,
+.dark .rdp-head,
+.dark .rdp-row {
+  background: hsl(var(--background)) !important;
 }
 .rdp-head th {
   font-size: 1.2rem;

@@ -118,9 +118,9 @@ export default function ActivityPage() {
 
   return (
     <>
-    <div className="w-full min-h-screen flex flex-col items-start p-12 bg-gray-50 relative min-h-screen">
-      <h1 className="text-4xl font-extrabold mb-8">活動日カレンダー</h1>
-      <div className="border rounded-2xl shadow-2xl bg-white p-2" style={{ minWidth: 320, maxWidth: 700 }}>
+    <div className="w-full min-h-screen flex flex-col items-start p-12 bg-background text-foreground relative min-h-screen">
+      <h1 className="text-4xl font-extrabold mb-8 text-foreground">活動日カレンダー</h1>
+      <div className="border rounded-2xl shadow-2xl bg-background text-foreground p-2" style={{ minWidth: 320, maxWidth: 700 }}>
         {/* FullCalendar JSX re-enabled */}
         {FullCalendar && (
           // JSXエラー回避: React.createElementで描画

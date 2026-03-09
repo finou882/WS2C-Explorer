@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 import AuthButton from "@/components/AuthButton";
+import { Moon, Sun } from "lucide-react";
+import { useThemeMode } from "@/hooks/useThemeMode";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
@@ -20,11 +22,29 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // ダークモード廃止
 
+  const [dark, setDark] = useThemeMode();
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* ヘッダー右上に認証ボタン */}
-      <div className="w-full flex justify-end items-center px-6 py-2 bg-white border-b sticky top-0 z-40">
-        <AuthButton />
+      {/* ヘッダー右上に認証・ダークモード切替ボタン */}
+      <div className="w-full flex items-center justify-between px-6 py-2 bg-background border-b sticky top-0 z-40 gap-4">
+        {/* トップバー一本化: ロゴ/タイトル/メニュー/認証/ダーク切替 */}
+        <div className="flex items-center gap-6">
+          <a href="/" className="font-bold text-2xl text-foreground hover:underline transition-colors select-none">WS2C Explorer</a>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen((v) => !v)}>
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+          <button
+            aria-label="ダークモード切替"
+            className="rounded-full p-2 hover:bg-muted transition-colors border border-primary"
+            style={{ background: dark ? '#222' : '#fff', color: dark ? '#fff' : '#222' }}
+            onClick={() => setDark((v: boolean) => !v)}
+          >
+            {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <AuthButton />
+        </div>
       </div>
       {/* Right-side drawer sidebar for all screen sizes */}
       <div
@@ -36,7 +56,7 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="fixed inset-y-0 right-0 w-64 bg-background border-l shadow-lg">
           <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="font-bold text-lg">メニュー</h1>
+            <h1 className="font-bold text-lg text-foreground">メニュー</h1>
             <Button
               variant="ghost"
               size="icon"
@@ -82,7 +102,7 @@ export default function Layout({ children }: LayoutProps) {
         />
         <div className="fixed inset-y-0 left-0 w-64 bg-background border-r">
           <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="font-bold text-lg">WS2C Explorer</h1>
+            <h1 className="font-bold text-lg text-foreground">WS2C Explorer</h1>
             <Button
               variant="ghost"
               size="icon"
@@ -123,24 +143,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="w-full">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-background border-b">
-          <div className="flex items-center justify-between h-14 px-4">
-            <div className="flex-1 flex items-center">
-              <a href="/" className="text-2xl font-extrabold text-black hover:underline transition-colors w-4/5 truncate">
-                WS2C Exproler
-              </a>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* ダークモード切替ボタン削除 */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(true)}
-                className="ml-2"
-              >
-                <Menu className="w-7 h-7" />
-              </Button>
-            </div>
-          </div>
+            {/* Removed top bar for consolidation */}
         </header>
 
         {/* Page content */}

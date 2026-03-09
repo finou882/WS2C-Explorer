@@ -67,7 +67,7 @@ export default function ItemDetailPage() {
     document.title = item ? `${item.name} | WS2C Explorer` : "アイテム詳細 | WS2C Explorer";
   }, [item]);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pointer-events-none opacity-60">
       <div className="flex items-center gap-4">
         <Link to="/items">
           <Button variant="ghost" size="icon">
