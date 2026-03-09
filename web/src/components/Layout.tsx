@@ -148,7 +148,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
       {/* 右下バージョン表記 */}
       <div className="fixed bottom-2 right-4 z-50 text-xs text-muted-foreground select-none pointer-events-none">
-        v1.0.0-alpha by Finou
+        v1.1.0-alpha byFinou
       </div>
     </div>
   );
