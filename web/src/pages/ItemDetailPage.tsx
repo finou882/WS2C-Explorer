@@ -1,4 +1,3 @@
-  // ...existing code...
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +21,7 @@ const statusLabels: Record<string, { label: string; variant: "success" | "warnin
 
 
 export default function ItemDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   if (!id) return null;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
