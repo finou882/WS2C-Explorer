@@ -10,13 +10,16 @@ const app = new Hono<{ Bindings: Env }>();
 // Middleware
 app.use("*", logger());
 app.use("*", async (c, next) => {
-  let corsOrigin: string | string[] = c.env?.CORS_ORIGIN || process.env.CORS_ORIGIN || "*";
-  // Support comma-separated origins
-  if (typeof corsOrigin === "string" && corsOrigin.includes(",")) {
-    corsOrigin = corsOrigin.split(",").map(o => o.trim());
-  }
+  let corsOrigin = c.env?.CORS_ORIGIN || process.env.CORS_ORIGIN || "*";
+  const allowedOrigins = typeof corsOrigin === "string"
+    ? corsOrigin.split(",").map(o => o.trim())
+    : [corsOrigin];
+
   const corsMiddleware = cors({
-    origin: corsOrigin,
+    origin: (origin) => {
+      if (!origin) return null;
+      return allowedOrigins.includes(origin) ? origin : null;
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
