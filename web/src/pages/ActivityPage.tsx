@@ -1,23 +1,43 @@
-import React from "react";
-import { useState, useRef, useEffect } from "react";
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { supabase } from "../lib/supabase";
+  // Utility to get reservation by date
+  type Reservation = { id?: string; date: string; use: string; about: string };
+  function findReservationByDate(reservations: Reservation[], date: Date): Reservation | undefined {
+    const ymd = date.toLocaleDateString('sv-SE');
+    return reservations.find((r: Reservation) => r.date === ymd);
+  }
 
-// Utility to get reservation by date
-type Reservation = { id?: string; date: string; use: string; about: string };
-function findReservationByDate(reservations: Reservation[], date: Date): Reservation | undefined {
-  const ymd = date.toLocaleDateString('sv-SE');
-  return reservations.find((r: Reservation) => r.date === ymd);
-}
+  // React hooks and supabase import
+  // (already imported at top, but ensure correct usage)
+  // Fix missing braces
 
-export default function ActivityPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelDate, setPanelDate] = useState<Date | null>(null);
   const [form, setForm] = useState<{ about: string; team: string }>({ about: '', team: '' });
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [reservations, setReservations] = useState<{ id?: string; date: string; use: string; about: string }[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [allowedTeams, setAllowedTeams] = useState<string[]>([]);
+  // ユーザー未ログイン時は何も表示しない
+  if (userEmail === null) return null;
+
+  // ログインユーザーのemail取得
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      setUserEmail(data.user?.email ?? null);
+    })();
+  }, []);
+
+  // emailからusers_permissionを取得し、許可班リストをセット
+  useEffect(() => {
+    if (!userEmail) return;
+    (async () => {
+      const { data, error } = await supabase.from('users_permission').select('permission').eq('email', userEmail);
+      if (!error && data) {
+        // 複数行なら複数班許可
+        setAllowedTeams(data.map((row: { permission: string }) => row.permission));
+      }
+    })();
+  }, [userEmail]);
 
   useEffect(() => {
     (async () => {
@@ -41,6 +61,7 @@ export default function ActivityPage() {
     document.title = "活動日カレンダー | WS2C Explorer";
   }, []);
 
+
   // Map team value to label for display
   const teamOptions = [
     { value: 'experiment', label: '実験班' },
@@ -49,6 +70,10 @@ export default function ActivityPage() {
     { value: 'space', label: '宇宙班' },
     { value: 'ai', label: 'AI班' },
   ];
+  // allowedTeams（ユーザーごと許可された班）だけに絞る
+  const filteredTeamOptions = allowedTeams.length > 0
+    ? teamOptions.filter(opt => allowedTeams.includes(opt.value))
+    : teamOptions;
   const getTeamLabel = (value: string) => {
     const found = teamOptions.find(opt => opt.value === value);
     return found ? found.label : value;
@@ -137,7 +162,7 @@ export default function ActivityPage() {
       </div>
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 h-full w-[400px] bg-background text-foreground shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ borderTopLeftRadius: 24, borderBottomLeftRadius: 24 }}
       >
         <div className="p-8">
@@ -149,16 +174,12 @@ export default function ActivityPage() {
           <form onSubmit={handleReserve}>
             <div className="mb-4">
               <label className="block mb-1">活動内容</label>
-              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-1">活動内容</label>
-              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required />
+              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full bg-background text-foreground" required />
             </div>
             <div className="mb-4">
               <label className="block mb-1">使用班</label>
-              <select name="team" value={form.team} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required>
-                {teamOptions.map(opt => (
+              <select name="team" value={form.team} onChange={handleFormChange} className="border rounded px-2 py-1 w-full bg-background text-foreground" required>
+                {filteredTeamOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
@@ -181,4 +202,3 @@ export default function ActivityPage() {
     </div>
     </>
   );
-}

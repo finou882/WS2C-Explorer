@@ -3,7 +3,7 @@ import AuthButton from "@/components/AuthButton";
 import { Moon, Sun } from "lucide-react";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon } from "lucide-react";
+import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui";
 
@@ -15,6 +15,7 @@ const navigation = [
   { name: "ダッシュボード", href: "/", icon: LayoutDashboard },
   { name: "アイテム", href: "/items", icon: Package },
   { name: "活動日", href: "/activity", icon: CalendarIcon },
+  { name: "設定", href: "/settings", icon: Settings },
 ];
 
 export default function Layout({ children }: LayoutProps) {
@@ -114,7 +115,29 @@ export default function Layout({ children }: LayoutProps) {
           <nav className="p-4 space-y-1">
             {navigation.map((item) => {
               const isActive =
-                item.href === "/"
+                <nav className="p-4 space-y-1">
+                  {navigation.map((item) => {
+                    const isActive =
+                      item.href === "/"
+                        ? location.pathname === "/"
+                        : location.pathname.startsWith(item.href);
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                  <Link to="/eula" className={navClass("/eula")}>利用規約</Link>
                   ? location.pathname === "/"
                   : location.pathname.startsWith(item.href);
               return (

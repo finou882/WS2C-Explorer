@@ -1,12 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+
 import {
   DashboardPage,
   ItemsPage,
   ItemDetailPage,
   ItemFormPage,
- ActivityPage, // Added ActivityPage import
+  ActivityPage,
 } from "@/pages";
+import SettingsPage from "./pages/SettingsPage";
+import EulaPage from "./pages/EulaPage";
 
 export default function App() {
   return (
@@ -17,7 +20,9 @@ export default function App() {
         <Route path="/items/new" element={<ItemFormPage />} />
         <Route path="/items/:id" element={<ItemDetailPage />} />
         <Route path="/items/:id/edit" element={<ItemFormPage />} />
-        <Route path="/activity" element={<ActivityPage />} /> // Added ActivityPage route
+        <Route path="/activity" element={<ActivityPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/eula" element={<EulaPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
