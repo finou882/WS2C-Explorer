@@ -1,14 +1,18 @@
-  // Utility to get reservation by date
-  type Reservation = { id?: string; date: string; use: string; about: string };
-  function findReservationByDate(reservations: Reservation[], date: Date): Reservation | undefined {
-    const ymd = date.toLocaleDateString('sv-SE');
-    return reservations.find((r: Reservation) => r.date === ymd);
-  }
+import React, { useState, useRef, useEffect } from "react";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { supabase } from "../lib/supabase";
 
-  // React hooks and supabase import
-  // (already imported at top, but ensure correct usage)
-  // Fix missing braces
+// Utility to get reservation by date
+type Reservation = { id?: string; date: string; use: string; about: string };
+function findReservationByDate(reservations: Reservation[], date: Date): Reservation | undefined {
+  const ymd = date.toLocaleDateString('sv-SE');
+  return reservations.find((r: Reservation) => r.date === ymd);
+}
 
+
+export default function ActivityPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelDate, setPanelDate] = useState<Date | null>(null);
   const [form, setForm] = useState<{ about: string; team: string }>({ about: '', team: '' });
@@ -16,8 +20,6 @@
   const [reservations, setReservations] = useState<{ id?: string; date: string; use: string; about: string }[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [allowedTeams, setAllowedTeams] = useState<string[]>([]);
-  // ユーザー未ログイン時は何も表示しない
-  if (userEmail === null) return null;
 
   // ログインユーザーのemail取得
   useEffect(() => {
@@ -162,7 +164,7 @@
       </div>
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 h-full w-[400px] bg-background text-foreground shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ borderTopLeftRadius: 24, borderBottomLeftRadius: 24 }}
       >
         <div className="p-8">
@@ -174,11 +176,15 @@
           <form onSubmit={handleReserve}>
             <div className="mb-4">
               <label className="block mb-1">活動内容</label>
-              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full bg-background text-foreground" required />
+              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-1">活動内容</label>
+              <input name="about" value={form.about} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required />
             </div>
             <div className="mb-4">
               <label className="block mb-1">使用班</label>
-              <select name="team" value={form.team} onChange={handleFormChange} className="border rounded px-2 py-1 w-full bg-background text-foreground" required>
+              <select name="team" value={form.team} onChange={handleFormChange} className="border rounded px-2 py-1 w-full" required>
                 {filteredTeamOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
@@ -202,3 +208,4 @@
     </div>
     </>
   );
+}

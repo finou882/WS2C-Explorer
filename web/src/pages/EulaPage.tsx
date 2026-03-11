@@ -1,8 +1,18 @@
-import React from "react";
+// ...existing code...
 import { Link } from "react-router-dom";
-import eulaText from "../EULA.md?raw";
+
+import { marked } from "marked";
+import { useEffect, useState } from "react";
 
 export default function EulaPage() {
+  const [eulaText, setEulaText] = useState("");
+
+  useEffect(() => {
+    fetch("/EULA.md")
+      .then((res) => res.text())
+      .then((text) => setEulaText(text));
+  }, []);
+
   return (
     <div className="max-w-3xl mx-auto p-8 bg-background text-foreground">
       <h1 className="text-3xl font-bold mb-6">利用規約・EULA</h1>

@@ -25,7 +25,6 @@ export default function DashboardPage() {
 
   // ログインユーザーのemail取得（onAuthStateChangeも監視）
   useEffect(() => {
-    let ignore = false;
     const getAndSetUser = async () => {
       const { data } = await supabase.auth.getUser();
       const email = data.user?.email ?? null;
@@ -36,7 +35,7 @@ export default function DashboardPage() {
       const email = session?.user?.email ?? null;
       setUserEmail(email);
     });
-    return () => { ignore = true; listener?.subscription?.unsubscribe(); };
+    return () => { listener?.subscription?.unsubscribe(); };
   }, []);
 
   // userEmailがセットされたらpermissionチェック

@@ -1,11 +1,15 @@
-  const teamOptions = [
-    { value: 'experiment', label: '実験班' },
-    { value: 'robot', label: 'ロボット班' },
-    { value: 'bio', label: '生物班' },
-    { value: 'space', label: '宇宙班' },
-    { value: 'ai', label: 'AI班' },
-  ];
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
+const teamOptions = [
+  { value: 'experiment', label: '実験班' },
+  { value: 'robot', label: 'ロボット班' },
+  { value: 'bio', label: '生物班' },
+  { value: 'space', label: '宇宙班' },
+  { value: 'ai', label: 'AI班' },
+];
+
+function SettingsPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   // ユーザー未ログイン時は何も表示しない
   if (userEmail === null) return null;
@@ -59,6 +63,7 @@
               ))}
             </select>
           </div>
+          // ...existing code...
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             disabled={!currentTeam || saving}
@@ -70,3 +75,6 @@
       )}
     </div>
   );
+}
+
+export default SettingsPage;
