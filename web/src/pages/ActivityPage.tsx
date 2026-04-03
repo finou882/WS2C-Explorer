@@ -164,13 +164,13 @@ export default function ActivityPage() {
       </div>
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 h-full w-[400px] bg-background text-foreground border-l border-border shadow-2xl z-50 transition-transform duration-300 ease-in-out ${panelOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ borderTopLeftRadius: 24, borderBottomLeftRadius: 24 }}
       >
         <div className="p-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">活動予約</h2>
-            <button onClick={closePanel} className="text-2xl font-bold text-gray-400 hover:text-gray-600">×</button>
+            <button onClick={closePanel} className="text-2xl font-bold text-muted-foreground hover:text-foreground">×</button>
           </div>
           <div className="mb-2 text-lg">日付: {panelDate ? panelDate.toLocaleDateString() : ''}</div>
           <form onSubmit={handleReserve}>
