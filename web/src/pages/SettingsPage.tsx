@@ -11,36 +11,103 @@ const teamOptions = [
 
 function SettingsPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  // ユーザー未ログイン時は何も表示しない
-  if (userEmail === null) return null;
-  const [currentTeam, setCurrentTeam] = useState<string>("");
+  const [currentTeams, setCurrentTeams] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const loadPermissions = async (email: string | null) => {
+    if (!email) {
+      setCurrentTeams([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data: permData, error } = await supabase
+      .from("users_permission")
+      .select("permission")
+      .eq("email", email);
+
+    if (error) {
+      setErrorMessage(`初期値の取得に失敗しました: ${error.message}`);
+      setLoading(false);
+      return;
+    }
+
+    setCurrentTeams((permData ?? []).map((row: { permission: string }) => row.permission));
+    setLoading(false);
+  };
 
   useEffect(() => {
+    let mounted = true;
+
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      const email = data.user?.email ?? null;
-      setUserEmail(email);
-      if (!email) return setLoading(false);
-      const { data: permData } = await supabase.from('users_permission').select('permission').eq('email', email);
-      setCurrentTeam(permData?.[0]?.permission ?? "");
-      setLoading(false);
+      try {
+        const { data } = await supabase.auth.getUser();
+        const email = data.user?.email ?? null;
+        if (!mounted) return;
+        setUserEmail(email);
+        await loadPermissions(email);
+      } catch (error) {
+        if (!mounted) return;
+        setErrorMessage(`初期値の取得に失敗しました: ${(error as Error).message}`);
+        setLoading(false);
+      }
     })();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const email = session?.user?.email ?? null;
+      if (!mounted) return;
+      setLoading(true);
+      setUserEmail(email);
+      setErrorMessage(null);
+      setMessage(null);
+      await loadPermissions(email);
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
+  const toggleTeamSelection = (value: string) => {
+    setCurrentTeams((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
   const handleSave = async () => {
-    if (!userEmail || !currentTeam) return;
+    if (!userEmail || currentTeams.length === 0) return;
     setSaving(true);
-    // 既存レコードがあればupdate、なければinsert
-    const { data: exist } = await supabase.from('users_permission').select('permission').eq('email', userEmail);
-    if (exist && exist.length > 0) {
-      await supabase.from('users_permission').update({ permission: currentTeam }).eq('email', userEmail);
-    } else {
-      await supabase.from('users_permission').insert([{ email: userEmail, permission: currentTeam }]);
+    setMessage(null);
+    setErrorMessage(null);
+
+    const { error: deleteError } = await supabase
+      .from("users_permission")
+      .delete()
+      .eq("email", userEmail);
+
+    if (deleteError) {
+      setSaving(false);
+      setErrorMessage(`保存に失敗しました: ${deleteError.message}`);
+      return;
     }
+
+    const { error: insertError } = await supabase
+      .from("users_permission")
+      .insert(currentTeams.map((team) => ({ email: userEmail, permission: team })));
+
+    if (insertError) {
+      setSaving(false);
+      setErrorMessage(`保存に失敗しました: ${insertError.message}`);
+      return;
+    }
+
+    localStorage.setItem(`team-dialog-seen:${userEmail}`, "1");
     setSaving(false);
-    alert('班を更新しました');
+    setMessage("所属班を保存しました。");
   };
 
   return (
@@ -50,23 +117,34 @@ function SettingsPage() {
         <div>読み込み中...</div>
       ) : (
         <>
-          <div className="mb-4">
-            <label className="block mb-1">所属班</label>
-            <select
-              className="border rounded px-2 py-1 w-full"
-              value={currentTeam}
-              onChange={e => setCurrentTeam(e.target.value)}
-            >
-              <option value="">選択してください</option>
+          {!userEmail && (
+            <div className="mb-4 text-sm text-muted-foreground">ログインすると所属班を編集できます。</div>
+          )}
+
+          {userEmail && (
+            <div className="mb-4">
+              <label className="block mb-2">所属班（複数選択可）</label>
+              <div className="space-y-2 border rounded px-3 py-3">
               {teamOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <label key={opt.value} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={currentTeams.includes(opt.value)}
+                    onChange={() => toggleTeamSelection(opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
               ))}
-            </select>
-          </div>
-          // ...existing code...
+              </div>
+            </div>
+          )}
+
+          {errorMessage && <p className="mb-3 text-sm text-red-500">{errorMessage}</p>}
+          {message && <p className="mb-3 text-sm text-green-600">{message}</p>}
+
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            disabled={!currentTeam || saving}
+            disabled={!userEmail || currentTeams.length === 0 || saving}
             onClick={handleSave}
           >
             {saving ? '保存中...' : '保存'}

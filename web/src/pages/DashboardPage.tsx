@@ -11,6 +11,8 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [showTeamDialog, setShowTeamDialog] = useState(false);
   const [teamSelect, setTeamSelect] = useState<string[]>([]);
+  const [registeringTeam, setRegisteringTeam] = useState(false);
+  const [teamDialogError, setTeamDialogError] = useState<string | null>(null);
   const teamOptions = [
     { value: 'experiment', label: '実験班' },
     { value: 'robot', label: 'ロボット班' },
@@ -55,9 +57,16 @@ export default function DashboardPage() {
   // 班登録ハンドラ
   const handleTeamRegister = async () => {
     if (!userEmail || teamSelect.length === 0) return;
-    await supabase
+    setRegisteringTeam(true);
+    setTeamDialogError(null);
+    const { error } = await supabase
       .from('users_permission')
       .insert(teamSelect.map((team) => ({ email: userEmail, permission: team })));
+    setRegisteringTeam(false);
+    if (error) {
+      setTeamDialogError(`登録に失敗しました: ${error.message}`);
+      return;
+    }
     localStorage.setItem(`team-dialog-seen:${userEmail}`, "1");
     setShowTeamDialog(false);
   };
@@ -149,7 +158,16 @@ export default function DashboardPage() {
                 </label>
               ))}
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50" disabled={teamSelect.length === 0} onClick={handleTeamRegister}>登録</button>
+            {teamDialogError && (
+              <p className="mb-3 w-full text-sm text-red-500">{teamDialogError}</p>
+            )}
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              disabled={teamSelect.length === 0 || registeringTeam}
+              onClick={handleTeamRegister}
+            >
+              {registeringTeam ? "登録中..." : "登録"}
+            </button>
           </div>
         </div>
       )}
