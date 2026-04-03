@@ -4,6 +4,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { itemsApi } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import type { CreateItemInput } from "@/types";
 import {
   Button,
@@ -30,6 +31,25 @@ export default function ItemFormPage() {
     location: "",
   });
   const [error, setError] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (mounted) setIsLoggedIn(Boolean(data.user));
+    })();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: itemData } = useQuery({
     queryKey: ["items", id],
@@ -83,6 +103,11 @@ export default function ItemFormPage() {
     e.preventDefault();
     setError("");
 
+    if (!isLoggedIn && !isEditing) {
+      setError("ログインすると新規作成できます。");
+      return;
+    }
+
     const data: CreateItemInput = {
       name: formData.name,
       pieces: formData.pieces,
@@ -122,6 +147,12 @@ export default function ItemFormPage() {
             {error && (
               <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
                 {error}
+              </div>
+            )}
+
+            {!isLoggedIn && !isEditing && (
+              <div className="p-3 rounded-md bg-muted text-muted-foreground text-sm">
+                ログインすると新規アイテムを作成できます。
               </div>
             )}
 
@@ -208,7 +239,7 @@ export default function ItemFormPage() {
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending || (!isLoggedIn && !isEditing)}>
                 {isPending ? "保存中..." : isEditing ? "更新" : "作成"}
               </Button>
               <Link to={isEditing ? `/items/${id}` : "/items"}>

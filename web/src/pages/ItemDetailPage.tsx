@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { itemsApi } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import {
   Button,
   Card,
@@ -26,6 +27,25 @@ export default function ItemDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (mounted) setIsLoggedIn(Boolean(data.user));
+    })();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: itemData, isLoading } = useQuery({
     queryKey: ["items", id],
@@ -67,7 +87,7 @@ export default function ItemDetailPage() {
     document.title = item ? `${item.name} | WS2C Explorer` : "アイテム詳細 | WS2C Explorer";
   }, [item]);
   return (
-    <div className="space-y-6 pointer-events-none opacity-60">
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/items">
           <Button variant="ghost" size="icon">
@@ -84,11 +104,17 @@ export default function ItemDetailPage() {
         <Button
           variant="destructive"
           onClick={() => setShowDeleteConfirm(true)}
+          disabled={!isLoggedIn}
+          title={!isLoggedIn ? "ログインすると削除できます" : undefined}
         >
           <Trash2 className="w-4 h-4 mr-2" />
           削除
         </Button>
       </div>
+
+      {!isLoggedIn && (
+        <p className="text-sm text-muted-foreground">ログインするとアイテムを削除できます。</p>
+      )}
 
       {showDeleteConfirm && (
         <Card className="border-destructive">

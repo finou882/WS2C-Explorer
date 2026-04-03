@@ -1,20 +1,55 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Search, Plus, FileText } from "lucide-react";
 import { Card, CardContent, Input, Button, Badge } from "@/components/ui";
 import { loadPortfolioItems, stripMarkdown, type PortfolioItem } from "@/lib/portfolioStorage";
+import { supabase } from "@/lib/supabase";
 
 export default function PortfolioPage() {
+  const location = useLocation();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [search, setSearch] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     document.title = "ポートフォリオ | WS2C Explorer";
   }, []);
 
   useEffect(() => {
-    setItems(loadPortfolioItems());
-  }, [items]);
+    let mounted = true;
+
+    (async () => {
+      setIsLoading(true);
+      const next = await loadPortfolioItems();
+      if (mounted) {
+        setItems(next);
+        setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [location.key]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (mounted) setIsLoggedIn(Boolean(data.user));
+    })();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -31,13 +66,17 @@ export default function PortfolioPage() {
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">ポートフォリオ</h1>
-        <Link to="/portfolio/new">
-          <Button>
+        <Link to={isLoggedIn ? "/portfolio/new" : "/portfolio"}>
+          <Button disabled={!isLoggedIn} title={!isLoggedIn ? "ログインすると新規作成できます" : undefined}>
             <Plus className="w-4 h-4 mr-2" />
             新規
           </Button>
         </Link>
       </div>
+
+      {!isLoggedIn && (
+        <p className="text-sm text-muted-foreground">ログインするとポートフォリオを新規作成できます。</p>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -51,7 +90,13 @@ export default function PortfolioPage() {
         </div>
       </div>
 
-      {filteredItems.length === 0 ? (
+      {isLoading ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground">読み込み中...</p>
+          </CardContent>
+        </Card>
+      ) : filteredItems.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="w-12 h-12 text-muted-foreground mb-4" />
@@ -68,6 +113,8 @@ export default function PortfolioPage() {
                   <h3 className="font-semibold text-lg line-clamp-2">{item.title}</h3>
                   <Badge variant="secondary">{new Date(item.updatedAt).toLocaleDateString()}</Badge>
                 </div>
+
+                <p className="text-xs text-muted-foreground">作成者: {item.author || "不明"}</p>
 
                 {item.summary && <p className="text-sm text-muted-foreground line-clamp-2">{item.summary}</p>}
                 <p className="text-sm text-muted-foreground line-clamp-3">{stripMarkdown(item.markdown)}</p>

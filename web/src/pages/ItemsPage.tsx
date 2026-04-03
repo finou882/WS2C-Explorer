@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search, Package } from "lucide-react";
 import { itemsApi } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import {
   Button,
   Input,
@@ -23,6 +24,7 @@ const statusLabels: Record<string, { label: string; variant: "success" | "warnin
 export default function ItemsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const category = searchParams.get("category") ?? undefined;
   const status = searchParams.get("status") ?? undefined;
@@ -70,17 +72,39 @@ export default function ItemsPage() {
     document.title = "アイテム一覧 | WS2C Explorer";
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      if (mounted) setIsLoggedIn(Boolean(data.user));
+    })();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">アイテム一覧</h1>
-        <Link to="/items/new">
-          <Button>
+        <Link to={isLoggedIn ? "/items/new" : "/items"}>
+          <Button disabled={!isLoggedIn} title={!isLoggedIn ? "ログインすると新規作成できます" : undefined}>
             <Plus className="w-4 h-4 mr-2" />
             新規アイテム
           </Button>
         </Link>
       </div>
+
+      {!isLoggedIn && (
+        <p className="text-sm text-muted-foreground">ログインするとアイテムを作成・削除できます。</p>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4">
         <form onSubmit={handleSearch} className="flex-1 flex gap-2">
@@ -133,8 +157,8 @@ export default function ItemsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Package className="w-12 h-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground">アイテムがありません</p>
-            <Link to="/items/new" className="mt-4">
-              <Button variant="outline">アイテムを追加</Button>
+            <Link to={isLoggedIn ? "/items/new" : "/items"} className="mt-4">
+              <Button variant="outline" disabled={!isLoggedIn}>アイテムを追加</Button>
             </Link>
           </CardContent>
         </Card>

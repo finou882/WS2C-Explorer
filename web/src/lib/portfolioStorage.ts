@@ -1,13 +1,14 @@
+import { supabase } from "@/lib/supabase";
+
 export type PortfolioItem = {
   id: string;
   title: string;
   summary: string;
   tags: string[];
   markdown: string;
+  author?: string;
   updatedAt: string;
 };
-
-const STORAGE_KEY = "portfolio-items-v1";
 
 export function stripMarkdown(value: string) {
   return value
@@ -31,38 +32,78 @@ export function parseTags(value: string) {
   );
 }
 
-export function loadPortfolioItems() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return [] as PortfolioItem[];
-  try {
-    const parsed = JSON.parse(saved) as PortfolioItem[];
-    if (!Array.isArray(parsed)) return [] as PortfolioItem[];
-    return parsed;
-  } catch {
-    return [] as PortfolioItem[];
+function mapRowToItem(row: any): PortfolioItem {
+  return {
+    id: row.id,
+    title: row.title,
+    summary: row.summary ?? "",
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    markdown: row.markdown ?? "",
+    author: row.author ?? "",
+    updatedAt: row.updated_at ?? row.created_at ?? new Date().toISOString(),
+  };
+}
+
+async function getCurrentUserId() {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id ?? null;
+}
+
+export async function loadPortfolioItems() {
+  const { data, error } = await supabase
+    .from("portfolio_items")
+    .select("id, title, summary, tags, markdown, author, created_at, updated_at")
+    .order("updated_at", { ascending: false });
+
+  if (error || !data) return [] as PortfolioItem[];
+  return data.map(mapRowToItem);
+}
+
+export async function upsertPortfolioItem(payload: PortfolioItem) {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("ログインが必要です");
+  }
+
+  const { data, error } = await supabase
+    .from("portfolio_items")
+    .upsert(
+      {
+        id: payload.id,
+        user_id: userId,
+        title: payload.title,
+        summary: payload.summary,
+        tags: payload.tags,
+        markdown: payload.markdown,
+        author: payload.author ?? "",
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    )
+    .select("id, title, summary, tags, markdown, author, created_at, updated_at")
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "保存に失敗しました");
+  }
+
+  return mapRowToItem(data);
+}
+
+export async function deletePortfolioItem(id: string) {
+  const { error } = await supabase.from("portfolio_items").delete().eq("id", id);
+  if (error) {
+    throw new Error(error.message);
   }
 }
 
-export function savePortfolioItems(items: PortfolioItem[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
+export async function getPortfolioItemById(id: string) {
+  const { data, error } = await supabase
+    .from("portfolio_items")
+    .select("id, title, summary, tags, markdown, author, created_at, updated_at")
+    .eq("id", id)
+    .maybeSingle();
 
-export function upsertPortfolioItem(payload: PortfolioItem) {
-  const items = loadPortfolioItems();
-  const exists = items.some((item) => item.id === payload.id);
-  const next = exists
-    ? items.map((item) => (item.id === payload.id ? payload : item))
-    : [payload, ...items];
-  savePortfolioItems(next);
-  return next;
-}
-
-export function deletePortfolioItem(id: string) {
-  const next = loadPortfolioItems().filter((item) => item.id !== id);
-  savePortfolioItems(next);
-  return next;
-}
-
-export function getPortfolioItemById(id: string) {
-  return loadPortfolioItems().find((item) => item.id === id) ?? null;
+  if (error || !data) return null;
+  return mapRowToItem(data);
 }
