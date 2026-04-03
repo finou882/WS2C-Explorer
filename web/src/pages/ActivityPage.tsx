@@ -11,6 +11,17 @@ function findReservationByDate(reservations: Reservation[], date: Date): Reserva
   return reservations.find((r: Reservation) => r.date === ymd);
 }
 
+function parsePermissions(values: string[]) {
+  return Array.from(
+    new Set(
+      values
+        .flatMap((value) => value.split(","))
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
 
 export default function ActivityPage() {
   const [panelOpen, setPanelOpen] = useState(false);
@@ -35,8 +46,7 @@ export default function ActivityPage() {
     (async () => {
       const { data, error } = await supabase.from('users_permission').select('permission').eq('email', userEmail);
       if (!error && data) {
-        // 複数行なら複数班許可
-        setAllowedTeams(data.map((row: { permission: string }) => row.permission));
+        setAllowedTeams(parsePermissions(data.map((row: { permission: string }) => row.permission)));
       }
     })();
   }, [userEmail]);

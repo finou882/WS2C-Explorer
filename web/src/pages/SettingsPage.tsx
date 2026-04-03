@@ -9,6 +9,17 @@ const teamOptions = [
   { value: 'ai', label: 'AI班' },
 ];
 
+function parsePermissions(values: string[]) {
+  return Array.from(
+    new Set(
+      values
+        .flatMap((value) => value.split(","))
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
 function SettingsPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [currentTeams, setCurrentTeams] = useState<string[]>([]);
@@ -35,7 +46,7 @@ function SettingsPage() {
       return;
     }
 
-    setCurrentTeams((permData ?? []).map((row: { permission: string }) => row.permission));
+    setCurrentTeams(parsePermissions((permData ?? []).map((row: { permission: string }) => row.permission)));
     setLoading(false);
   };
 
@@ -84,24 +95,19 @@ function SettingsPage() {
     setMessage(null);
     setErrorMessage(null);
 
-    const { error: deleteError } = await supabase
+    const { error } = await supabase
       .from("users_permission")
-      .delete()
-      .eq("email", userEmail);
+      .upsert(
+        {
+          email: userEmail,
+          permission: currentTeams.join(","),
+        },
+        { onConflict: "email" }
+      );
 
-    if (deleteError) {
+    if (error) {
       setSaving(false);
-      setErrorMessage(`保存に失敗しました: ${deleteError.message}`);
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from("users_permission")
-      .insert(currentTeams.map((team) => ({ email: userEmail, permission: team })));
-
-    if (insertError) {
-      setSaving(false);
-      setErrorMessage(`保存に失敗しました: ${insertError.message}`);
+      setErrorMessage(`保存に失敗しました: ${error.message}`);
       return;
     }
 

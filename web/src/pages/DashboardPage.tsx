@@ -61,7 +61,13 @@ export default function DashboardPage() {
     setTeamDialogError(null);
     const { error } = await supabase
       .from('users_permission')
-      .insert(teamSelect.map((team) => ({ email: userEmail, permission: team })));
+      .upsert(
+        {
+          email: userEmail,
+          permission: teamSelect.join(","),
+        },
+        { onConflict: "email" }
+      );
     setRegisteringTeam(false);
     if (error) {
       setTeamDialogError(`登録に失敗しました: ${error.message}`);
