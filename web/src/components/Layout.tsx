@@ -3,7 +3,7 @@ import AuthButton from "@/components/AuthButton";
 import { Moon, Sun } from "lucide-react";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon, Settings } from "lucide-react";
+import { LayoutDashboard, Package, Menu, X, Calendar as CalendarIcon, Settings, Briefcase } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui";
 
@@ -15,6 +15,7 @@ const navigation = [
   { name: "ダッシュボード", href: "/", icon: LayoutDashboard },
   { name: "アイテム", href: "/items", icon: Package },
   { name: "活動日", href: "/activity", icon: CalendarIcon },
+  { name: "ポートフォリオ", href: "/portfolio", icon: Briefcase },
   { name: "設定", href: "/settings", icon: Settings },
 ];
 
