@@ -8,6 +8,8 @@ import {
   ItemFormPage,
   ActivityPage,
   PortfolioPage,
+  PortfolioEditorPage,
+  PortfolioDetailPage,
 } from "@/pages";
 import SettingsPage from "./pages/SettingsPage";
 import EulaPage from "./pages/EulaPage";
@@ -23,6 +25,9 @@ export default function App() {
         <Route path="/items/:id/edit" element={<ItemFormPage />} />
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/portfolio/new" element={<PortfolioEditorPage />} />
+        <Route path="/portfolio/:id" element={<PortfolioDetailPage />} />
+        <Route path="/portfolio/:id/edit" element={<PortfolioEditorPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/eula" element={<EulaPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
