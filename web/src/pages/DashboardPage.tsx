@@ -18,10 +18,6 @@ export default function DashboardPage() {
     { value: 'space', label: '宇宙班' },
     { value: 'ai', label: 'AI班' },
   ];
-  // ユーザー未ログイン時は何も表示しない
-  if (userEmail === null) return null;
-
-
 
   // ログインユーザーのemail取得（onAuthStateChangeも監視）
   useEffect(() => {
