@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Package, FolderOpen, AlertTriangle } from "lucide-react";
 import { itemsApi } from "@/lib/api";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
-import { fetchRecentActivityDays } from "@/lib/recentActivityApi"; // ←これを追加
+import { Badge, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { fetchNextActivityDay } from "@/lib/recentActivityApi";
+import { loadPortfolioItems } from "@/lib/portfolioStorage";
 
 export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -94,6 +95,17 @@ export default function DashboardPage() {
     queryFn: () => itemsApi.getCategories(),
   });
 
+  const { data: recentPortfolioItems } = useQuery({
+    queryKey: ["portfolio", "recent-dashboard"],
+    queryFn: loadPortfolioItems,
+    select: (items) => items.slice(0, 5),
+  });
+
+  const { data: nextActivityDay } = useQuery({
+    queryKey: ["activity", "next-day"],
+    queryFn: fetchNextActivityDay,
+  });
+
   const items = itemsData?.items ?? [];
   const categories = categoriesData?.categories ?? [];
 
@@ -135,15 +147,22 @@ export default function DashboardPage() {
   ];
 
   const recentItems = items.slice(0, 5);
+  const teamLabelMap: Record<string, string> = {
+    experiment: "実験班",
+    robot: "ロボット班",
+    bio: "生物班",
+    space: "宇宙班",
+    ai: "AI班",
+  };
 
-  // 直近一週間の活動日
-  const [recentActivity, setRecentActivity] = useState<string[]>([]);
-  useEffect(() => {
-    fetchRecentActivityDays(7).then(setRecentActivity).catch(() => setRecentActivity([]));
-  }, []);
-  // 曜日変換
-  const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
-  const recentWeekdays = recentActivity.map(date => weekDays[new Date(date).getDay()]);
+  const nextActivityDateLabel = nextActivityDay
+    ? new Date(nextActivityDay.date).toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "short",
+      })
+    : null;
 
   return (
     <>
@@ -178,14 +197,77 @@ export default function DashboardPage() {
         </div>
       )}
       <div className="space-y-6 w-full max-w-none px-0 text-left items-start justify-start">
-        {/* 直近一週間の活動曜日 */}
-        <div className="mb-2">
-          <span className="font-semibold">直近一週間の活動曜日：</span>
-          {recentWeekdays.length === 0 ? (
-            <span className="text-muted-foreground">（記録なし）</span>
-          ) : (
-            <span>{recentWeekdays.join("・")}</span>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-start justify-start">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-foreground">最近書いたポートフォリオ</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!recentPortfolioItems || recentPortfolioItems.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">
+                  ポートフォリオの投稿がありません
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {recentPortfolioItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/portfolio/${item.id}`}
+                      className="block rounded-lg p-3 bg-muted/40 hover:bg-muted transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-medium line-clamp-1">{item.title}</p>
+                        <Badge variant="secondary" className="shrink-0">
+                          {new Date(item.updatedAt).toLocaleDateString("ja-JP")}
+                        </Badge>
+                      </div>
+                      {item.summary && (
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.summary}</p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-foreground">次の活動日</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!nextActivityDay || !nextActivityDateLabel ? (
+                <p className="text-muted-foreground text-center py-4">
+                  予定されている活動日はありません
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-2xl font-bold">{nextActivityDateLabel}</p>
+                    <p className="text-sm text-muted-foreground mt-1">次回の予約日</p>
+                  </div>
+                  {nextActivityDay.use && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">使用班</p>
+                      <p className="font-medium">{teamLabelMap[nextActivityDay.use] ?? nextActivityDay.use}</p>
+                    </div>
+                  )}
+                  {nextActivityDay.about && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">活動内容</p>
+                      <p className="font-medium line-clamp-2">{nextActivityDay.about}</p>
+                    </div>
+                  )}
+                  <Link
+                    to="/activity"
+                    className="inline-block text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    活動日カレンダーを見る
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-start justify-start">
